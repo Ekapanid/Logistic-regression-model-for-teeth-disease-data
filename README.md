@@ -1,2 +1,2 @@
 # Logistic-regression-model-for-teeth-disease-data
-#A LOGISTIC REGRESSION MODEL USED ON TEETH DISEASE DATA. SOME OF THE COMMENTS ARE WRITTEN IN GREEK. IF THERE IS A PROBLEM READING THE COMMENTS PLEASE GO TO FILE--->REOPEN WITH ENCODING AND CHOOSE UTF-8. 
+# Loigistic regression models applied on teeth disease data
