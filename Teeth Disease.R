@@ -17,8 +17,6 @@ str(RF)
 RF$Gender<-as.numeric(RF$Gender)
 RF$ToothType<-as.numeric(RF$ToothType)
 
-#Εδώ οι ομάδες που δημιουργούνται είναι πλήθους 1 διότι δεν υπάρχουν άτομα που να μοιράζονται
-#κοινά χαρακτηριστικά ως προς την ηλικία τους τύπους δοντιών και τις άλλες μεταβλητές
 
 library(dplyr)
 
@@ -134,8 +132,8 @@ head(grouped_by_ev_merg)
 
 
 
-#Το logit μοντέλο στο καινούριο dataset
-#Τα logs βάλε
+#logit model on the new dataset
+
 
 logmod1.a<-glm(x~ as.factor(ToothType)*log(Age)+AllTeeth+as.factor(ToothType):AllTeeth+as.factor(Gender)+as.factor(Gender):log(Age),family=binomial(link="logit"),data=grouped_by_ev_merg)
 summary(logmod1.a)
@@ -175,7 +173,7 @@ anov2<-xtable(anov)
 
 print(anov2, type="html", file="C:/Users/ΕΥΡΙΠΙΔΗΣ/Documents/table8.html")
 
-#Το probit μοντέλο στο καινούριο dataset
+#probit model on new dataset
 
 logmod2.a<-glm(x~ as.factor(ToothType)*log(Age)+AllTeeth+as.factor(ToothType):AllTeeth+as.factor(Gender)+as.factor(Gender):Age+as.factor(Gender):AllTeeth,family=binomial(link="probit"),data=grouped_by_ev_merg)
 summary(logmod2.a)
@@ -215,7 +213,7 @@ anov2<-xtable(anov)
 
 print(anov2, type="html", file="C:/Users/ΕΥΡΙΠΙΔΗΣ/Documents/table9.html")
 
-#Το cloglog μοντέλο στο καινούριο dataset
+#clogclog models on new dataset
 
 
 logmod3.a<-glm(x~ as.factor(ToothType)*log(Age)+AllTeeth+as.factor(ToothType):AllTeeth+as.factor(Gender)+as.factor(Gender):log(Age)+as.factor(Gender):AllTeeth,family=binomial(link="cloglog"),data=grouped_by_ev_merg)
@@ -242,8 +240,6 @@ logmod3.g<-glm(x~
 
 summary(logmod3.g)
 
-#βγήκε το intercept λιγότερο σημαντικό, αλλά ουσιαστικά είναι η επίδραση του να έχει κάποιος τύπο δοντιών 2 και κανένα υγιές δόντι
-#Επειδή ο τύπος δοντιών 2 είναι επίπεδο μιας σημαντικής ποιοτικής μεταβλητής ενω ο αριθμός δοντιών όχι αποφασίστηκε να βγει η μεταβλητή AllTeeth
 
 logmod3.h<-glm(x~ 
                  as.factor(ToothType),family=binomial(link="cloglog"),data=grouped_by_ev_merg)
@@ -261,7 +257,7 @@ print(anov2, type="html", file="C:/Users/ΕΥΡΙΠΙΔΗΣ/Documents/table10.ht
 stargazer(logmod1.h,logmod2.h,logmod3.h,align=TRUE,type="html",out="C:/Users/ΕΥΡΙΠΙΔΗΣ/Documents/table3.html")
 
 
-#Έλεγχος κανονικότητας καταλοίπων Deviance
+#Goodness of fit graphical test with Deviance residuals
 sum.m1<-summary(logmod1.h)
 sum.m2<-summary(logmod2.h)
 sum.m3<-summary(logmod3.h)
@@ -303,7 +299,6 @@ BIC(logmod1.h,logmod2.h,logmod3.h)
 
 #Computing odds ratios and respective 95% CI's
 exp(coef(logmod1.h))
-# τα δ.ε.
 exp(confint(logmod1.h))
 
 ###################################################################################################################
