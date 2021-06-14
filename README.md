@@ -1,4 +1,4 @@
-# Logistic-regression-model-for-teeth-disease-data
+# Logistic-regression-model-for-teeth-disease-data Synopsis
 
 Analyzing data from a public health study with the goal of finding underlying factors that influence the probability of having a specific teeth disease. Variables of the dataset were:
 
