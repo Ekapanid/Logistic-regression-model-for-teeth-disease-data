@@ -305,6 +305,59 @@ exp(confint(logmod1.h))
 ###############################################################################################
 
 
+#Tree classification algorithm 
+
+
+RF$Gender<-as.factor(RF$Gender)
+RF$ToothType<-as.factor(RF$ToothType)
+RF$RF<-as.factor(RF$RF)
+
+str(RF)
+
+RF2<-RF[,-c(1,7)]
+
+RF2
+
+RF2<-RF2%>%
+  filter(ToothType!="5"& ToothType!="7")
+
+str(RF2)
+
+RF2<-data.frame(RF2)
+
+
+
+s_size <- floor(0.8 * nrow(RF2))
+set.seed(123)
+train_index <- sample(1:nrow(RF2), size = s_size)
+
+train<-RF2[train_index,]
+test<-RF2[-train_index, ]
+
+str(RF2)
+
+str(RF2$RF)
+
+head(RF2)
+
+tree.tip2<-tree(unlist(RF)~.,train)
+
+
+summary(tree.tip2)
+plot(tree.tip2)
+text(tree.tip2,pretty=0)
+
+
+tree.pred2<-predict(tree.tip2,test,type="class")
+
+
+ConMat2<-table(tree.pred2,test$RF)
+ConMat2
+confusionMatrix(ConMat2)
+
+
+
+
 
 
 
