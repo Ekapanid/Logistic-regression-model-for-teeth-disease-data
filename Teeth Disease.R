@@ -305,8 +305,14 @@ exp(confint(logmod1.h))
 ###############################################################################################
 
 
-#Tree classification algorithm 
+#Imbalanced data needs oversampling for prediction accuracy
 
+
+install.packages("smotefamily")
+library(smotefamily)
+library(caret)
+library(tree)
+library(e1071)
 
 RF$Gender<-as.factor(RF$Gender)
 RF$ToothType<-as.factor(RF$ToothType)
@@ -327,20 +333,40 @@ RF2<-data.frame(RF2)
 
 
 
-s_size <- floor(0.8 * nrow(RF2))
+s_size <- floor(0.6 * nrow(RF2))
 set.seed(123)
 train_index <- sample(1:nrow(RF2), size = s_size)
 
 train<-RF2[train_index,]
 test<-RF2[-train_index, ]
 
-str(RF2)
 
-str(RF2$RF)
+str(train)
 
-head(RF2)
 
-tree.tip2<-tree(unlist(RF)~.,train)
+dum<-dummyVars("~.",data=train)
+
+trsf <- data.frame(predict(dum, newdata=train))
+trsf<-trsf[,-c(7,9,10)]
+
+dum2<-dummyVars("~.",data=test)
+trsf2 <- data.frame(predict(dum, newdata=test))
+trsf2<-trsf2[,-c(7,9,10)]
+
+
+
+str(trsf)
+
+trsf_bal<-BLSMOTE(trsf[,-8],trsf$RF)
+
+new_train<-trsf_bal$data
+
+new_train$class
+
+
+
+#trees
+tree.tip2<-tree(as.factor(class)~.,new_train)
 
 
 summary(tree.tip2)
@@ -348,12 +374,78 @@ plot(tree.tip2)
 text(tree.tip2,pretty=0)
 
 
-tree.pred2<-predict(tree.tip2,test,type="class")
+tree.pred2<-predict(tree.tip2,trsf2,type="class")
 
+trsf2
 
-ConMat2<-table(tree.pred2,test$RF)
+ConMat2<-table(tree.pred2,trsf2$RF.1)
 ConMat2
 confusionMatrix(ConMat2)
+
+
+cv.tip<-cv.tree(tree.tip2, FUN=prune.misclass)
+names(cv.tip)
+cv.tip
+
+prune.tip <- prune.tree(tree.tip2, best=4)
+
+summary(prune.tip)
+
+plot(prune.tip)
+text(prune.tip,pretty=0)
+
+
+tree.pred3<-predict(prune.tip, trsf2, type="class")
+
+ConMat3<-table(tree.pred3,trsf2$RF.1)
+ConMat3
+confusionMatrix(ConMat3)
+
+
+
+#SVMs
+
+library(ggplot2)
+
+neg<-trsf2%>%
+  filter(class==0)
+
+pos<-trsf2%>%
+  filter(class==1)
+
+boxplot(pos$Age)
+
+
+out<-boxplot.stats(pos$Age)$out
+
+out_ind <- which(pos$Age %in% c(out))
+out_ind
+
+vect<-trsf2[out_ind,]%>%
+  filter(class==1)
+
+
+svmfit<-svm(as.factor(class)~.-Gender.0-Gender.1,data=new_train,kernel="linear",cost=10,scaled=FALSE)
+
+
+
+
+set.seed(1)
+tune.out=tune(svm,as.factor(class)~.,data=new_train,kernel="linear",ranges=list(cost=c(0.001,0.01,0.1,1.5,5,10,100)))
+
+
+bestmod =tune.out$best.model
+summary(tune.out)
+summary (bestmod)
+
+
+pred<-predict(svmfit,trsf2)
+
+
+
+xtab1<-table(pred,trsf2$RF.1)
+confusionMatrix(xtab1)
+
 
 
 
