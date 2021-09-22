@@ -407,23 +407,6 @@ confusionMatrix(ConMat3)
 
 library(ggplot2)
 
-neg<-trsf2%>%
-  filter(class==0)
-
-pos<-trsf2%>%
-  filter(class==1)
-
-boxplot(pos$Age)
-
-
-out<-boxplot.stats(pos$Age)$out
-
-out_ind <- which(pos$Age %in% c(out))
-out_ind
-
-vect<-trsf2[out_ind,]%>%
-  filter(class==1)
-
 
 svmfit<-svm(as.factor(class)~.-Gender.0-Gender.1,data=new_train,kernel="linear",cost=10,scaled=FALSE)
 
